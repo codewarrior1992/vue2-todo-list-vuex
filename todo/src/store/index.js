@@ -3,21 +3,18 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  strict : true,
   state: {
-    isLoading : false
-  },
-  getters: {
   },
   actions: {
-    updateLoading(context,payload){
-      context.commit('LOADING', payload)
-    }
   },
   mutations: {
-    LOADING(state,payload){
-      state.isLoading = payload
-    }
+
+  }, 
+  getters: {
+
   },
   modules: {
-  }
+
+  }, 
 })

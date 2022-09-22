@@ -2,6 +2,10 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
     <div class="card">
+        <!-- Loading -->
+        <LoadingEffect :active.sync="isLoading"></LoadingEffect>
+
+        <!-- Card -->
         <div class="card-header">
             <h2>
                 <router-link :to="`/${todo._id}`">
@@ -44,6 +48,7 @@ export default {
     },
     data(){
         return {
+            isLoading : false,
             completed : 0,
         }
     },
@@ -67,11 +72,13 @@ export default {
             this.$bus.$emit('open-remove-modal', this.todo)
         },
         async isCompleted(val){
+            this.isLoading = true;
             const obj = { completed : val, _id  : this.todo._id} ;
             const response = await this.axios.patch('http://127.0.0.1:3000/todo/checked', obj);
             if(!response.data.success) return 
-            this.$emit('callGetAll')
+            this.$emit('callGetAll');
             this.$bus.$emit('message',response.data.message);
+            this.isLoading = false;
         }
     },
 }

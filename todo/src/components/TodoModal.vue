@@ -1,5 +1,8 @@
 <template>
   <div>
+    <!-- Loading -->
+    <LoadingEffect :active.sync="isLoading"></LoadingEffect>
+
     <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -44,6 +47,7 @@
 export default {
   data(){
     return {
+      isLoading : false,
       catchObj : {},
       catchTodo : ''
     }
@@ -51,22 +55,25 @@ export default {
   methods:{
     async update(){
       if(this.catchTodo ==='') return;
-
+      this.isLoading = true;
       const obj = { title : this.catchTodo, _id  : this.catchObj._id};
       const response = await this.axios.patch('http://127.0.0.1:3000/todo/update', obj);
       
       if(!response.data.success) return 
       this.$emit('callGetAll');
-      this.$bus.$emit('message',response.data.message);
       this.reset();
+      this.$bus.$emit('message',response.data.message);
+      this.isLoading = false;
     },
     async remove(){
+      this.isLoading = true;
       const obj = { _id  : this.catchObj._id};
       const response = await this.axios.post('http://127.0.0.1:3000/todo/delete', obj);
       if(!response.data.success) return 
       this.$emit('callGetAll');
-      this.$bus.$emit('message',response.data.message);
       this.reset();
+      this.$bus.$emit('message',response.data.message);
+      this.isLoading = false;
     },
     reset(){
       this.catchObj = {};

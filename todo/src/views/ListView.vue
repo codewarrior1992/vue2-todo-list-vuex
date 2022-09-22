@@ -80,12 +80,10 @@ export default {
       this.getAll();
     },
     async getAll(){
-      // this.isLoading = true;
       this.$store.dispatch('updateLoading', true)
       const response = await this.axios.get('http://127.0.0.1:3000/todo/all');
       if(!response.data.success) return 
       this.list = response.data.list
-      // this.isLoading = false;
       this.$store.dispatch('updateLoading', false)
     },
     todoClassify(val){ this.classify = val }
