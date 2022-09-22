@@ -44,7 +44,7 @@ export default {
   },
   data(){
     return {
-      // isLoading : false,
+      isLoading : false,
       todo : '',
       list:[],
       classify : null
@@ -65,26 +65,23 @@ export default {
         } 
       }
     },
-    isLoading(){
-      return this.$store.state.isLoading;
-    }
   },
   methods:{
     async create(){
       if(this.todo === '') return
-      const todo = {title : this.todo , completed : false}
+      const todo = {title : this.todo , completed : false};
       const response = await this.axios.post('http://127.0.0.1:3000/todo/create',todo);
       if(!response.data.success) return
       this.$bus.$emit('message',response.data.message);
-      this.todo = ''
+      this.todo = '';
       this.getAll();
     },
     async getAll(){
-      this.$store.dispatch('updateLoading', true)
+      this.isLoading = true;
       const response = await this.axios.get('http://127.0.0.1:3000/todo/all');
       if(!response.data.success) return 
-      this.list = response.data.list
-      this.$store.dispatch('updateLoading', false)
+      this.list = response.data.list;
+      this.isLoading = false;
     },
     todoClassify(val){ this.classify = val }
   },
