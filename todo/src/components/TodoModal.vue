@@ -60,7 +60,7 @@ export default {
       const response = await this.axios.patch('http://127.0.0.1:3000/todo/update', obj);
       
       if(!response.data.success) return 
-      this.$emit('callGetAll');
+      this.$emit('call-get-all');
       this.reset();
       this.$bus.$emit('message',response.data.message);
       this.isLoading = false;
@@ -70,7 +70,7 @@ export default {
       const obj = { _id  : this.catchObj._id};
       const response = await this.axios.post('http://127.0.0.1:3000/todo/delete', obj);
       if(!response.data.success) return 
-      this.$emit('callGetAll');
+      this.$emit('call-get-all');
       this.reset();
       this.$bus.$emit('message',response.data.message);
       this.isLoading = false;

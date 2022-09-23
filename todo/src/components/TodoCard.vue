@@ -52,18 +52,6 @@ export default {
             completed : 0,
         }
     },
-    watch:{
-        completed:{
-            async handler(val){
-                const obj = { completed : val, _id  : this.todo._id} ;
-                const response = await this.axios.patch('http://127.0.0.1:3000/todo/checked', obj);
-                if(!response.data.success) return 
-                this.$emit('callGetAll')
-                this.$bus.$emit('message',response.data.message);
-            },
-            deep:true,
-        }
-    },
     methods:{
         openUpdateModal(){
             this.$bus.$emit('open-update-modal', this.todo)
@@ -76,7 +64,7 @@ export default {
             const obj = { completed : val, _id  : this.todo._id} ;
             const response = await this.axios.patch('http://127.0.0.1:3000/todo/checked', obj);
             if(!response.data.success) return 
-            this.$emit('callGetAll');
+            this.$emit('call-get-all');
             this.$bus.$emit('message',response.data.message);
             this.isLoading = false;
         }

@@ -20,12 +20,12 @@
     <!-- List -->
     <ul class="row g-3">
       <li class="col-lg-3 col-md-4 col-sm-6" v-for="(todo,i) in todoArr" :key="i">
-        <TodoCard :todo="todo" @callGetAll="getAll"/>
+        <TodoCard :todo="todo" @call-get-all="getAll"/>
       </li>
     </ul>
 
     <!-- Todo Modal -->
-    <TodoModal @callGetAll="getAll"/>
+    <TodoModal @call-get-all="getAll"/>
   </div>
 </template>
 
