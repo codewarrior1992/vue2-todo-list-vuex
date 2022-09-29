@@ -7,29 +7,22 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
   export default{
     data(){
       return{
         isLoading:false,
-        obj : {}
       }
     },
     computed:{
-      todo(){
-        return this.obj
-      },
+      ...mapGetters('todoModules',['todo'])
     },
     methods:{
       async getTodo(){
-        this.isLoading = true
-        const response = await this.axios.get('http://127.0.0.1:3000/todo/get-one',
-          {
-            params : { _id : this.$route.params.id }
-          }
-        )
-        this.obj = response.data.todo
-        if(!response.data.success) return 
-        this.isLoading = false;
+        this.$store.dispatch('updateLoading',true);
+        const payload = {params : { _id : this.$route.params.id }};
+        this.$store.dispatch('todoModules/getTodo', payload)
+        this.$store.dispatch('updateLoading',false);
       }
     },  
     created(){

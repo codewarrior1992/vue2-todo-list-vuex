@@ -1,8 +1,5 @@
 <template>
   <div>
-    <!-- Loading -->
-    <LoadingEffect :active.sync="isLoading"></LoadingEffect>
-
     <!-- Update Modal -->
     <div class="modal fade" id="updateModal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -44,56 +41,48 @@
   </div>
 </template>
 <script>
+import { mapActions, mapGetters } from 'vuex';
 export default {
   data(){
     return {
       isLoading : false,
-      catchObj : {},
       catchTodo : ''
     }
   },
   methods:{
     async update(){
       if(this.catchTodo ==='') return;
-      this.isLoading = true;
+      this.$store.dispatch('updateLoading',true)
+
       const obj = { title : this.catchTodo, _id  : this.catchObj._id};
-      const response = await this.axios.patch('http://127.0.0.1:3000/todo/update', obj);
-      
-      if(!response.data.success) return 
-      this.$emit('call-get-all');
-      this.reset();
-      this.$bus.$emit('message',response.data.message);
-      this.isLoading = false;
-    },
-    async remove(){
-      this.isLoading = true;
-      const obj = { _id  : this.catchObj._id};
-      const response = await this.axios.post('http://127.0.0.1:3000/todo/delete', obj);
-      if(!response.data.success) return 
-      this.$emit('call-get-all');
-      this.reset();
-      this.$bus.$emit('message',response.data.message);
-      this.isLoading = false;
-    },
-    reset(){
-      this.catchObj = {};
+      const message = await this.$store.dispatch('todoModules/updateTodo',obj)
+      const timestamp = Math.floor(Date.now() / 1000);
+      const payload = { message, timestamp }
+
+      this.getList()
+      this.$store.dispatch('showMessage',payload);
+      this.$store.dispatch('removeMessage',payload);
+      this.$store.dispatch('updateLoading',false)
+
       this.catchTodo = '';
     },
+    async remove(){
+      this.$store.dispatch('updateLoading',true);
+
+      const obj = { _id  : this.catchObj._id};
+      const message = await this.$store.dispatch('todoModules/removeTodo',obj);
+      const timestamp = Math.floor(Date.now() / 1000);
+      const payload = { message, timestamp };
+
+      this.getList()
+      this.$store.dispatch('showMessage', payload);
+      this.$store.dispatch('removeMessage',payload);
+      this.$store.dispatch('updateLoading',false)
+    },
+    ...mapActions('todoModules',['getList'])
   },
-  created(){
-    this.$bus.$on('open-update-modal', (todo)=>{
-      this.catchObj = todo
-      this.catchTodo = todo.title
-    }),
-    this.$bus.$on('open-remove-modal', (todo)=>{
-      this.catchObj = todo
-      this.catchTodo = todo.title
-    })
-  },
-  beforeDestroy(){
-    this.reset();
-    this.$bus.$off('open-update-modal');
-    this.$bus.$off('open-remove-modal');
+  computed:{
+    ...mapGetters(['catchObj'])
   }
 }
 </script>

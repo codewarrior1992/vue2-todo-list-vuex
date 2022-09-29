@@ -34,6 +34,7 @@ import TodoCard from '@/components/TodoCard.vue';
 import AlertMessage from '@/components/AlertMessage.vue';
 import TodoModal from '@/components/TodoModal.vue';
 import FilterList from '../components/FilterList.vue';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   components: {
@@ -44,9 +45,7 @@ export default {
   },
   data(){
     return {
-      isLoading : false,
       todo : '',
-      list:[],
       classify : null
     }
   },
@@ -55,35 +54,42 @@ export default {
     todoArr(){
       switch(this.classify){
         case true : {
-          return [...this.list].filter((item)=> item.completed)
+          return this.list.filter((item)=> item.completed)
         } 
         case false : {
-          return [...this.list].filter((item)=> !item.completed)
+          return this.list.filter((item)=> !item.completed)
         } 
         case null : {
           return this.list
         } 
       }
     },
+    ...mapGetters(['isLoading']),
+    ...mapGetters('todoModules',['list'])
   },
   methods:{
+    todoClassify(val){ this.classify = val },
     async create(){
       if(this.todo === '') return
+      this.$store.dispatch('updateLoading',true)
       const todo = {title : this.todo , completed : false};
-      const response = await this.axios.post('http://127.0.0.1:3000/todo/create',todo);
-      if(!response.data.success) return
-      this.$bus.$emit('message',response.data.message);
+      const message = await this.$store.dispatch('todoModules/createTodo', todo);
+      const timestamp = Math.floor(Date.now() / 1000);
+      const payload = { message, timestamp }
+
+      this.$store.dispatch('showMessage', payload);
+      this.$store.dispatch('removeMessage', payload);
+
       this.todo = '';
-      this.getAll();
+      this.getList();
+      this.$store.dispatch('updateLoading',false)
     },
     async getAll(){
-      this.isLoading = true;
-      const response = await this.axios.get('http://127.0.0.1:3000/todo/all');
-      if(!response.data.success) return 
-      this.list = response.data.list;
-      this.isLoading = false;
+      this.$store.dispatch('updateLoading',true)
+      this.getList()
+      this.$store.dispatch('updateLoading',false)
     },
-    todoClassify(val){ this.classify = val }
+    ...mapActions('todoModules',['getList'])
   },
   async created(){
     await this.getAll();

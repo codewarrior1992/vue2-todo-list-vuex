@@ -2,9 +2,6 @@
 <!-- eslint-disable vue/no-mutating-props -->
 <template>
     <div class="card">
-        <!-- Loading -->
-        <LoadingEffect :active.sync="isLoading"></LoadingEffect>
-
         <!-- Card -->
         <div class="card-header">
             <h2>
@@ -31,8 +28,8 @@
         </div>
         <div class="card-footer">
             <div class="d-flex justify-content-between">
-                <button type="button" class="btn btn-secondary" @click="openUpdateModal" data-bs-toggle="modal" data-bs-target="#updateModal">更新</button>
-                <button type="button" class="btn btn-danger" @click="openRemoveModal"  data-bs-toggle="modal" data-bs-target="#removeModal">刪除</button>
+                <button type="button" class="btn btn-secondary" @click="openModal" data-bs-toggle="modal" data-bs-target="#updateModal">更新</button>
+                <button type="button" class="btn btn-danger" @click="openModal"  data-bs-toggle="modal" data-bs-target="#removeModal">刪除</button>
             </div>
         </div>
     </div>
@@ -53,20 +50,22 @@ export default {
         }
     },
     methods:{
-        openUpdateModal(){
-            this.$bus.$emit('open-update-modal', this.todo)
-        },
-        openRemoveModal(){
-            this.$bus.$emit('open-remove-modal', this.todo)
+        openModal(){
+            this.$store.dispatch('openModal',this.todo)
         },
         async isCompleted(val){
-            this.isLoading = true;
+            this.$store.dispatch('updateLoading',true);
+
             const obj = { completed : val, _id  : this.todo._id} ;
-            const response = await this.axios.patch('http://127.0.0.1:3000/todo/checked', obj);
-            if(!response.data.success) return 
-            this.$emit('call-get-all');
-            this.$bus.$emit('message',response.data.message);
-            this.isLoading = false;
+            const message = await this.$store.dispatch('todoModules/isCompleted', obj);
+        
+            const timestamp = Math.floor(Date.now() / 1000);
+            const payload = { message, timestamp };
+
+            this.$store.dispatch('todoModules/getList');
+            this.$store.dispatch('showMessage', payload);
+            this.$store.dispatch('removeMessage',payload);
+            this.$store.dispatch('updateLoading',false)
         }
     },
 }

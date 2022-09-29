@@ -7,34 +7,13 @@
     </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 export default {
     data(){
-        return {
-            messages:[]
-        }
+        return {}
     },
-    methods:{
-        showMessage(message){
-            const timestamp = Math.floor(new Date() / 1000)
-            this.messages.push({
-                message,
-                timestamp
-            });
-            this.removeMessage(timestamp)
-        },
-        removeMessage(timestamp){
-            setTimeout(function(){
-                this.messages = this.messages.filter((item) => !item.timestamp == timestamp)
-            }.bind(this),3000)
-        }
-    },
-    mounted(){
-        this.$bus.$on('message',(val)=>{
-            this.showMessage(val)
-        })
-    },
-    beforeDestroy(){
-        this.$bus.$off('message')
+    computed:{
+        ...mapGetters(['messages'])
     }
 }
 </script>
